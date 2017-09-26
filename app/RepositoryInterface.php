@@ -29,7 +29,7 @@ interface RepositoryInterface
      *
      * @return array
      */
-    public static function findAll(): array;
+    public function findAll(): array;
 
     /**
      * return a result for a given id
@@ -38,7 +38,7 @@ interface RepositoryInterface
      *
      * @return array
      */
-    public static function find(int $id);
+    public function find(int $id);
 
     /**
      * return an array of results for the given query
@@ -49,5 +49,5 @@ interface RepositoryInterface
      *
      * @return array
      */
-    public static function query(string $statement, array $attributes = [], bool $singleResults = false): array;
+    public function query(string $statement, array $attributes = [], bool $singleResults = false): array;
 }

@@ -2,20 +2,8 @@
 require '../app/Autoloader.php';
 App\Autoloader::register();
 
-if (isset($_GET['p'])) {
-    $p = $_GET['p'];
-} else {
-    $p = 'home';
-}
+$app = App\Config::getInstance();
 
-ob_start();
+$app->title = 'Mon Super Site';
 
-if ($p === 'home') {
-    require '../pages/home.php';
-} else {
-    require '../pages/single.php';
-}
-
-$content = ob_get_clean();
-
-require '../pages/templates/default.php';
+$exampleRepository = $app->getRepository('Example');

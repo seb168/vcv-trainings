@@ -12,7 +12,7 @@ namespace VcvTrainings\Repository;
 
 use App\Repository;
 
-class Example extends Repository
+class ExampleRepository extends Repository
 {
 
     protected static $table = 'example';

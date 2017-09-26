@@ -8,56 +8,57 @@
  */
 
 declare(strict_types=1);
+
 namespace App;
+
+use App\Database\MysqlDatabase;
 
 class App
 {
-
-    const DB_NAME     = 'database';
-    const DB_USER     = 'root';
-    const DB_PASSWORD = 'root';
-    const DB_HOST     = 'localhost';
-
     /**
-     * @var Database
+     * @var App
      */
-    private static $database;
-
+    private static $instance;
     /**
      * @var string
      */
-    private static $title = 'my site';
+    public $title = "My website";
+    /**
+     * @var MysqlDatabase
+     */
+    private $dbInstance;
 
-    public static function getDb(): Database
+    /**
+     * @return mixed
+     */
+    public static function getInstance()
     {
-        if (self::$database == null) {
-            self::$database = new Database(self::DB_NAME, self::DB_USER, self::DB_PASSWORD, self::DB_HOST);
+        if (is_null(self::$instance)) {
+            self::$instance = new App();
         }
 
-        return self::$database;
+        return self::$instance;
     }
 
-    public static function createNotFoundException(string $message = '')
+    public function getRepository($name)
     {
-        // TODO: mieux que ça
-        header("HTTP/1.0 404 not Found");
-        header('Location:index.php?p=404');
+        $class_name = '\\src\\Repository\\'.ucfirst($name).'Repository';
+        return new $class_name($this->getDb());
     }
 
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
+    public function getDb()
     {
-        return self::$title;
-    }
+        $config = Config::getInstance();
+        if (is_null($this->dbInstance)) {
+            $this->dbInstance = new MysqlDatabase(
+                $config->get('db_name'),
+                $config->get('db_user'),
+                $config->get('db_pass'),
+                $config->get('db_host')
+            );
+        }
 
-    /**
-     * @param string $title
-     */
-    public static function setTitle(string $title)
-    {
-        self::$title = self::$title.' | '.$title;
+        return $this->dbInstance;
     }
 
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * class Database.php
+ * class MysqlDatabase.php
  *
  * @project   vcv-trainings
  * @author    Sébastien RINGOT
@@ -9,11 +9,11 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Database;
 
 use \PDO;
 
-class Database
+class MysqlDatabase extends Database
 {
     /**
      * @var string
@@ -65,10 +65,14 @@ class Database
      *
      * @return array
      */
-    public function query(string $statement, string $className, bool $singleResult = false): array
+    public function query(string $statement, string $className = null, bool $singleResult = false): array
     {
         $request = $this->getPDO()->query($statement);
-        $request->setFetchMode(PDO::FETCH_CLASS, $className);
+        if ($className === null) {
+            $request->setFetchMode(PDO::FETCH_OBJ);
+        } else {
+            $request->setFetchMode(PDO::FETCH_CLASS, $className);
+        }
 
         if ($singleResult) {
             $results = $request->fetch();

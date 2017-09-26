@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Database\Database;
+
 /**
  * Class Repository
  *
@@ -20,17 +22,39 @@ namespace App;
  */
 class Repository implements RepositoryInterface
 {
+    /**
+     * @var string
+     */
+    protected $table;
+    /**
+     * @var Database
+     */
+    protected $database;
 
-    protected static $table;
+    /**
+     * Repository constructor.
+     *
+     * @param $database
+     */
+    public function __construct(Database $database)
+    {
+        $this->database = $database;
+        if (is_null($this->table)) {
+            $folders     = explode('\\', get_class($this));
+            $className   = end($folders);
+            $this->table = strtolower(str_replace('Repository', '', $className));
+        }
+    }
+
 
     /**
      * return all the data of the table
      *
      * @return array
      */
-    public static function findAll()
+    public function findAll(): array
     {
-        return App::getDb()->query("SELECT * FROM ".static::$table, get_called_class());
+        return $this->database->query("SELECT * FROM ".$this->table, get_called_class());
     }
 
     /**
@@ -40,10 +64,10 @@ class Repository implements RepositoryInterface
      *
      * @return array
      */
-    public static function find(int $id)
+    public function find(int $id)
     {
-        return App::getDb()->prepare("
-        SELECT * FROM ".static::$table."
+        return $this->database->prepare("
+        SELECT * FROM ".$this->table."
         WHERE id = ?
         ", [$id], get_called_class(), true);
     }
@@ -57,12 +81,12 @@ class Repository implements RepositoryInterface
      *
      * @return array
      */
-    public static function query(string $statement, array $attributes = [], bool $singleResults = false): array
+    public function query(string $statement, array $attributes = [], bool $singleResults = false): array
     {
         if (empty($attributes)) {
-            return App::getDb()->query($statement, get_called_class(), $singleResults);
+            return $this->database->query($statement, get_called_class(), $singleResults);
         } else {
-            return App::getDb()->prepare($statement, $attributes, get_called_class(), $singleResults);
+            return $this->database->prepare($statement, $attributes, get_called_class(), $singleResults);
         }
     }
 }
